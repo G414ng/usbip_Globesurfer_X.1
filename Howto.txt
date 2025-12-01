@@ -1,0 +1,53 @@
+# GlobesurferX.1
+This is it USBIP Server for router Option Globesurfer X.1
+
+Installation ( After your router running openwrt )
+1. Ssh to the router
+2. opkg update
+3. opkg install usbip usbip-server kmod-usbip-host
+4. (optional) opkg install kmod-usb-core kmod-usb2 kmod-usb3
+  # Load the modules
+6. modbprobe usbip-core
+7. modprobe usbip-host
+
+# If you're seeing -ash: usbip: not found, it means the usbip tools are not installed or not available for your OpenWrt build.
+Fixes :
+1. ssh to the router
+2. opkg update
+3. opkg list | grep usbip
+   # you will see something like this
+    usbip - 2.0-1 - USB/IP utilities
+    usbip-server - ...
+    usbip-client - ...
+    kmod-usbip-host - ...
+    kmod-usbip-vhci - ...
+4. opkg install usbip usbip-server kmod-usbip-host
+
+
+** To make usbip server run on boot and auto binding
+1. list usb device ( usbip list -l )
+   Output :
+   - busid 1-1 (xxxx:xxxx)
+     USB Receiver
+2. Bind usb device
+   usbip bind -b 1-1
+3. start usbip daemon
+   /usr/sbin/usbip -D
+4. make run on boor
+   vi /etc/rc.local  
+   _#add these lines_
+   
+   # Load kernel modules
+  modprobe usbip-core
+  modprobe usbip-host
+
+  # Start usbip daemon
+  /usr/sbin/usbipd -D
+
+  # Wait for USB devices to be detected
+  sleep 2
+
+  # Bind USB device by bus ID (example: 1-1)
+  usbip bind -b 1-1
+5. save and exit with :wd
+6. reboot and then after reboot check with " usbip list -l "
